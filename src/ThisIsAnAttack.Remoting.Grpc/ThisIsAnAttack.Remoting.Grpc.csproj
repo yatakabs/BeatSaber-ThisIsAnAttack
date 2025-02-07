@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>ThisIsAnAttack.Remoting.Grpc</RootNamespace>
+
+    <VersionPrefix>0.0.1</VersionPrefix>
+    <VersionSuffix>$(VersionSuffix)</VersionSuffix>
+  </PropertyGroup>
+
+  <ItemGroup>
+
+    <PackageReference Include="Google.Protobuf" Version="3.29.3" Publicize="true" />
+    <PackageReference Include="Grpc.Core" Version="2.46.6" />
+    <PackageReference Include="Grpc.Tools" Version="2.69.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <!-- gRPC -->
+  <ItemGroup>
+    <Protobuf Include="Protos\*.proto" GrpcServices="Client,Server" UseGrpcCore="true" />
+  </ItemGroup>
+
+
+
+</Project>

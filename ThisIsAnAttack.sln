@@ -5,15 +5,30 @@ VisualStudioVersion = 17.12.35707.178
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7E2B3981-64E6-45B5-8159-4A837645016D}"
 	ProjectSection(SolutionItems) = preProject
+		.dockerignore = .dockerignore
 		.editorconfig = .editorconfig
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
+		.unitTestGeneratorConfig = .unitTestGeneratorConfig
+		coverlet.runsettings = coverlet.runsettings
+		Directory.Build.props = Directory.Build.props
+		Directory.Build.targets = Directory.Build.targets
 		LICENSE.txt = LICENSE.txt
 		README.md = README.md
 		Settings.XamlStyler = Settings.XamlStyler
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThisIsAnAttack", "src\ThisIsAnAttack\ThisIsAnAttack.csproj", "{65FA6D63-C052-4C21-9617-736665F1C99F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThisIsAnAttack.Tests", "src\ThisIsAnAttack.Tests\ThisIsAnAttack.Tests.csproj", "{F0F9ECFE-740E-454B-84A7-81430E99AB73}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThisIsAnAttack.Remoting.Grpc", "src\ThisIsAnAttack.Remoting.Grpc\ThisIsAnAttack.Remoting.Grpc.csproj", "{EA48EC74-6167-44AE-9346-FEB6E5DF1FE7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThisIsAnAttack.Remoting.Grpc.Tests", "src\ThisIsAnAttack.Remoting.Grpc.Tests\ThisIsAnAttack.Remoting.Grpc.Tests.csproj", "{FFD8FF6B-9294-489A-A9C7-A42E2A4928E2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MockGrpcService", "src\MockGrpcService\MockGrpcService.csproj", "{02F375CB-8B30-4A43-A947-D5175766B475}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestClient", "src\TestClient\TestClient.csproj", "{E9003A3D-C54E-4B1A-868F-F4077E9B2CDA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -28,6 +43,36 @@ Global
 		{65FA6D63-C052-4C21-9617-736665F1C99F}.DebugInGame|Any CPU.Build.0 = DebugInGame|Any CPU
 		{65FA6D63-C052-4C21-9617-736665F1C99F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{65FA6D63-C052-4C21-9617-736665F1C99F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F0F9ECFE-740E-454B-84A7-81430E99AB73}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F0F9ECFE-740E-454B-84A7-81430E99AB73}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F0F9ECFE-740E-454B-84A7-81430E99AB73}.DebugInGame|Any CPU.ActiveCfg = Debug|Any CPU
+		{F0F9ECFE-740E-454B-84A7-81430E99AB73}.DebugInGame|Any CPU.Build.0 = Debug|Any CPU
+		{F0F9ECFE-740E-454B-84A7-81430E99AB73}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F0F9ECFE-740E-454B-84A7-81430E99AB73}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EA48EC74-6167-44AE-9346-FEB6E5DF1FE7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA48EC74-6167-44AE-9346-FEB6E5DF1FE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA48EC74-6167-44AE-9346-FEB6E5DF1FE7}.DebugInGame|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA48EC74-6167-44AE-9346-FEB6E5DF1FE7}.DebugInGame|Any CPU.Build.0 = Debug|Any CPU
+		{EA48EC74-6167-44AE-9346-FEB6E5DF1FE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA48EC74-6167-44AE-9346-FEB6E5DF1FE7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FFD8FF6B-9294-489A-A9C7-A42E2A4928E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FFD8FF6B-9294-489A-A9C7-A42E2A4928E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FFD8FF6B-9294-489A-A9C7-A42E2A4928E2}.DebugInGame|Any CPU.ActiveCfg = Debug|Any CPU
+		{FFD8FF6B-9294-489A-A9C7-A42E2A4928E2}.DebugInGame|Any CPU.Build.0 = Debug|Any CPU
+		{FFD8FF6B-9294-489A-A9C7-A42E2A4928E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FFD8FF6B-9294-489A-A9C7-A42E2A4928E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02F375CB-8B30-4A43-A947-D5175766B475}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02F375CB-8B30-4A43-A947-D5175766B475}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02F375CB-8B30-4A43-A947-D5175766B475}.DebugInGame|Any CPU.ActiveCfg = Debug|Any CPU
+		{02F375CB-8B30-4A43-A947-D5175766B475}.DebugInGame|Any CPU.Build.0 = Debug|Any CPU
+		{02F375CB-8B30-4A43-A947-D5175766B475}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02F375CB-8B30-4A43-A947-D5175766B475}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E9003A3D-C54E-4B1A-868F-F4077E9B2CDA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E9003A3D-C54E-4B1A-868F-F4077E9B2CDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E9003A3D-C54E-4B1A-868F-F4077E9B2CDA}.DebugInGame|Any CPU.ActiveCfg = Debug|Any CPU
+		{E9003A3D-C54E-4B1A-868F-F4077E9B2CDA}.DebugInGame|Any CPU.Build.0 = Debug|Any CPU
+		{E9003A3D-C54E-4B1A-868F-F4077E9B2CDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E9003A3D-C54E-4B1A-868F-F4077E9B2CDA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

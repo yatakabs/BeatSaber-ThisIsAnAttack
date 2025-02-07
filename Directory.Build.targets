@@ -1,0 +1,10 @@
+<Project>
+  <!--Code Generator Configurations-->
+  <ItemGroup>
+    <!--Ignore generated files by default-->
+    <Compile Remove="$(SourceRoot)/**/UnitGenerator.SourceGenerator/**/*.cs" />
+    <Compile Remove="$(SourceRoot)/**/*.g.cs" />
+    <Compile Remove="$(SourceRoot)/**/*.generated.cs" />
+    <Compile Remove="$(SourceRoot)/**/*.Generated.cs" />
+  </ItemGroup>
+</Project>

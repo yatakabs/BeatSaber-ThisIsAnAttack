@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ThisIsAnAttack": {
+      "commandName": "Project",
+      "commandLineArgs": "steam://rungameid/620980"
+    }
+  }
+}

@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package game_score;
+
+import "google/protobuf/empty.proto";
+
+
+service ScoreService {
+    rpc StreamScores (stream ScoreRequest) returns (google.protobuf.Empty);
+}
+
+message ScoreRequest {
+    string player_id = 1;   
+    int32 rawScore = 2;
+    int32 missedNotes = 3;
+    int32 hitBombs = 4;
+    int32 combo = 5;
+    bool softFailed = 6;
+    int64 pauseTimestamp = 7;
+    int64 timestamp = 8;
+}

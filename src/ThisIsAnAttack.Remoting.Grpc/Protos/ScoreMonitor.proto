@@ -1,0 +1,409 @@
+syntax = "proto3";
+
+package game_score;
+
+
+/** google.protobuf.Empty represents an empty message.
+ */
+ import "google/protobuf/empty.proto";
+
+
+
+/** ScoreService provides real-time score monitoring capabilities.
+ *
+ * This service allows streaming of player scores during gameplay.
+ *
+ * @service ScoreService
+ * @rpc StreamScores Streams score updates from players.
+ * @rpc RealtimeScoreStream Streams real-time game progress of players.
+ * @rpc GetVersion Retrieves the version of the service.
+ */
+service ScoreService {
+    rpc StreamScores (stream ScoreRequest) returns (google.protobuf.Empty);
+
+    rpc RealtimeScoreStream (stream PlayerGameProgress) returns (google.protobuf.Empty);
+    
+    rpc GetSynchronizedProgress (google.protobuf.Empty) returns (SynchronizedGameProgress);
+
+    rpc GetVersion (google.protobuf.Empty) returns (Version);
+}
+
+
+/** Version represents the version of the service.
+ *
+ * @field major Major version number.
+ * @field minor Minor version number.
+ * @field patch Patch version number.
+ */
+ message Version {
+    int32 major = 1;
+    int32 minor = 2;
+    int32 patch = 3;
+    string suffix = 4;
+ }
+
+/** ScoreRequest represents a single score update event from a player.
+ *
+ * Contains detailed information about the player's current performance including
+ * score, misses, combo and game state.
+ *
+ * @field player_id Unique identifier for the player
+ * @field rawScore The current raw score achieved by the player
+ * @field missedNotes Total number of notes missed by the player
+ * @field hitBombs Number of bomb obstacles hit by the player
+ * @field combo Current combo streak
+ * @field softFailed Indicates if the player has soft-failed the level
+ * @field pauseTimestamp Unix timestamp when the game was last paused (0 if not paused)
+ * @field timestamp Unix timestamp when this score event occurred
+ */
+message ScoreRequest {
+    string player_id = 1;
+    int32 rawScore = 2;
+    int32 missedNotes = 3;
+    int32 hitBombs = 4;
+    int32 combo = 5;
+    bool softFailed = 6;
+    int64 pauseTimestamp = 7;
+    int64 timestamp = 8;
+}
+
+
+/** GamePlayStatistics tracks a player's performance statistics during gameplay.
+ *
+ * Contains comprehensive information about the player's current session including
+ * the game play options and pause statistics.
+ *
+ * @field game_play_options Options for the gameplay.
+ * @field pause_statistics Statistics related to game pauses.
+ */
+message GamePlayStatistics {
+    GamePlayOptions game_play_options = 1;
+    PauseStatistics pause_statistics = 2;
+}
+
+
+/** PauseStatistics represents the statistics related to game pauses.
+    *
+    * Contains detailed information about the current pause state, duration, and count.
+    *
+    * @field is_currently_paused Indicates if the game is currently paused.
+    * @field current_pause_started_at Unix timestamp when the current pause started.
+    * @field current_pause_duration Duration of the current pause in milliseconds.
+    * @field total_pause_duration Total duration of all pauses in milliseconds.
+    * @field total_pause_count Total number of pauses that have occurred.
+    */
+message PauseStatistics {
+    bool is_currently_paused = 1;
+    int64 current_pause_started_at  = 2;
+    int64 current_pause_duration = 3;
+    int64 total_pause_duration = 4;
+    int64 total_pause_count = 5;
+}
+
+/** PlayerGamePlayState represents the various states a player's gameplay session can be in.
+ *
+ * @value Unknown The state is unknown.
+ * @value Playing The player is currently playing.
+ * @value Paused The game is paused.
+ * @value Finished The game has finished.
+ * @value Failed The player has failed the game.
+ * @value Quit The player has quit the game.
+ * @value SoftFailed The player has soft-failed the game.
+ */
+enum PlayerGamePlayState {
+    Unknown = 0;
+    Playing = 1;
+    Paused = 2;
+    Finished = 4;
+    Failed = 8;
+    Quit = 16;
+    SoftFailed = 32;
+}
+
+/** GameMode represents the different modes a game can be played in.
+ *
+ * @value GameModeUnknown The game mode is unknown.
+ * @value Solo The game is played solo.
+ * @value Party The game is played in party mode.
+ * @value Campaign The game is played in campaign mode.
+ * @value Multiplayer The game is played in multiplayer mode.
+ * @value Practice The game is played in practice mode.
+ */
+enum GameMode {
+    GameModeUnknown = 0;
+    Solo = 1;
+    Party = 2;
+    Campaign = 4;
+    Multiplayer = 8;
+    Practice = 16;
+}
+
+/** GamePlayModifier represents the different modifiers that can be applied to gameplay.
+ *
+ * @value None No modifiers applied.
+ * @value NoFail The player cannot fail.
+ * @value InstaFail The player fails instantly upon a mistake.
+ * @value BatteryEnergy The player has battery energy.
+ * @value NoBombs No bombs are present in the game.
+ * @value NoObstacles No obstacles are present in the game.
+ * @value NoArrows No arrows are present in the game.
+ * @value GhostNotes Notes appear as ghosts.
+ * @value DisappearingArrows Arrows disappear.
+ * @value SmallCubes Notes are small and colored.
+ * @value ProMode The game is played in pro mode.
+ * @value StrictAngles The game has strict angles.
+ * @value ZenMode The game is played in zen mode.
+ * @value SlowerSong The song is played slower.
+ * @value FasterSong The song is played faster.
+ * @value SuperFastSong The song is played super fast.
+ */
+enum GamePlayModifier {
+    None = 0;
+    NoFail = 1;
+    InstaFail = 2;
+    BatteryEnergy = 4;
+    NoBombs = 8;
+    NoObstacles = 16;
+    NoArrows = 32;
+    GhostNotes = 64;
+    DisappearingArrows = 128;
+    SmallCubes = 256;
+    ProMode = 512;
+    StrictAngles = 1024;
+    ZenMode = 2048;
+    SlowerSong = 4096;
+    FasterSong = 8192;
+    SuperFastSong = 16384;
+}
+
+/** GamePlayOptions represents the options for gameplay.
+ *
+ * @field game_play_modifiers The modifiers applied to the gameplay.
+ */
+message GamePlayOptions {
+    repeated GamePlayModifier game_play_modifiers = 1;
+}
+
+/** SynchronizedGameProgress contains the latest synchronized progress of all players.
+ *
+ * @field progresses List of all players' synchronized game progress.
+ */
+message SynchronizedGameProgress {
+    repeated PlayerGameProgress progresses = 1;
+}
+
+/** PlayerGameProgress represents the progress of a player in the game.
+ *
+ * @field player_id Unique identifier for the player.
+ * @field game_progress Detailed progress information about the game.
+ * @field game_play_state Current state of the player's gameplay session.
+ * @field game_mode The mode in which the game is played.
+ * @field game_play_modifiers The modifiers applied to the gameplay.
+ * @field client_timestamp Unix timestamp when the data was constructed on the client.
+ * @field song_timestamp Unix timestamp indicating the position in the song.
+ * @field song_progress Progress of the song being played.
+ */
+message PlayerGameProgress {
+    string player_id = 1;
+    GameProgress game_progress = 2;
+    PlayerGamePlayState game_play_state = 3;
+    GamePlayStatistics game_play_statistics = 4;
+    GameMode game_mode = 5;
+    repeated GamePlayModifier game_play_modifiers = 6;
+    int64 client_timestamp = 7;
+    double song_timestamp = 8;
+    SongProgress song_progress = 9;
+}
+
+/** GameProgress represents the progress of the game.
+ *
+ * @field song_hash Unique identifier for the song.
+ * @field beatmap_level_id Unique identifier for the beatmap level.
+ * @field characteristic Characteristics of the beatmap.
+ * @field started_at Unix timestamp when the game started.
+ * @field ended_at Unix timestamp when the game ended.
+ * @field score_progress Detailed progress information about the score.
+ * @field difficulty Difficulty level of the game.
+ */
+message GameProgress {
+    string song_hash = 1;
+    string beatmap_level_id = 2;
+    Characteristic characteristic = 3;
+    int64 started_at = 4;
+    int64 ended_at = 5;
+    ScoreProgress score_progress = 6;
+    Difficulty difficulty = 7;
+}
+
+/** SongProgress represents the progress of the song being played.
+ *
+ * @field duration Total duration of the song.
+ * @field position Current position in the song.
+ */
+message SongProgress {
+    double duration = 1;
+    double position = 2;
+}
+
+/** ScoreProgress represents the progress of the score.
+ *
+ * @field current_score The current score achieved.
+ * @field current_max_score The current maximum score achievable.
+ * @field current_score_modified The current score with modifiers applied.
+ * @field current_max_score_modified The current maximum score achievable with modifiers applied.
+ * @field details Detailed information about the score progress.
+ */
+message ScoreProgress {
+    int64 current_score = 1;
+    int64 current_max_score = 2;
+    int64 current_score_modified = 3;
+    int64 current_max_score_modified = 4;
+    ScoreProgressDetails details = 5;
+}
+
+/** ScoreProgressDetails represents detailed information about the score progress.
+ *
+ * @field notes_total Total number of notes.
+ * @field notes_hit Number of notes hit.
+ * @field notes_missed Number of notes missed.
+ * @field notes_badcut Number of notes cut badly.
+ * @field bombs_total Total number of bombs.
+ * @field bombs_hit Number of bombs hit.
+ * @field bombs_passed Number of bombs passed.
+ * @field obstacles_total Total number of obstacles.
+ * @field obstacles_hit Number of obstacles hit.
+ * @field obstacles_passed Number of obstacles passed.
+ * @field obstacles_hit_count Number of times obstacles were hit.
+ * @field obstacles_hit_duration Duration of time obstacles were hit.
+ * @field max_combo Maximum combo achieved.
+ * @field combo Current combo streak.
+ * @field multiplier Current score multiplier.
+ * @field multiplier_progress Progress towards the next multiplier.
+ * @field energy Current energy level.
+ */
+message ScoreProgressDetails {
+    int32 notes_total = 1;
+    int32 notes_hit = 2;
+    int32 notes_missed = 3;
+    int32 notes_badcut = 4;
+    int32 bombs_total = 5;
+    int32 bombs_hit = 6;
+    int32 bombs_passed = 7;
+    int32 obstacles_total = 8;
+    int32 obstacles_hit = 9;
+    int32 obstacles_passed = 10;
+    int32 obstacles_hit_count = 11;
+    double obstacles_hit_duration = 12;
+    int32 max_combo = 13;
+    int32 combo = 14;
+    int32 multiplier = 15;
+    double multiplier_progress = 16;
+    double energy = 17;
+}
+
+/** Beatmap represents the beatmap being played.
+ *
+ * @field song_hash Unique identifier for the song.
+ * @field song_metadata Metadata about the song.
+ * @field beatmap_metadata Metadata about the beatmap.
+ * @field beatmap_levels Levels of the beatmap.
+ */
+message Beatmap {
+    string song_hash = 1;
+    SongMetadata song_metadata = 2;
+    BeatmapMetadata beatmap_metadata = 3;
+    repeated BeatmapLevel beatmap_levels = 4;
+}
+
+/** SongMetadata represents metadata about the song.
+ *
+ * @field song_hash Unique identifier for the song.
+ * @field song_name Name of the song.
+ * @field song_sub_name Subtitle of the song.
+ * @field song_author_name Author of the song.
+ * @field level_author_name Author of the level.
+ * @field beats_per_minute Beats per minute of the song.
+ * @field preview_start_time Start time of the song preview.
+ * @field preview_duration Duration of the song preview.
+ */
+message SongMetadata {
+    string song_hash = 1;
+    string song_name = 2;
+    string song_sub_name = 3;
+    string song_author_name = 4;
+    string level_author_name = 5;
+    double beats_per_minute = 6;
+    double preview_start_time = 7;
+    double preview_duration = 8;
+}
+
+/** BeatmapMetadata represents metadata about the beatmap.
+ *
+ * @field difficulty Difficulty level of the beatmap.
+ * @field characteristic Characteristics of the beatmap.
+ * @field difficulty_label Label of the difficulty.
+ * @field difficulty_rank Rank of the difficulty.
+ */
+message BeatmapMetadata {
+    string difficulty = 1;
+    string characteristic = 2;
+    string difficulty_label = 3;
+    int32 difficulty_rank = 4;
+}
+
+/** BeatmapLevel represents a level of the beatmap.
+ *
+ * @field characteristic Characteristics of the beatmap level.
+ * @field difficulty Difficulty level of the beatmap level.
+ * @field statistics Statistics of the beatmap level.
+ */
+message BeatmapLevel {
+    Characteristic characteristic = 1;
+    Difficulty difficulty = 2;
+    BeatmapLevelStatistics statistics = 3;
+}
+
+/** Characteristic represents characteristics of the beatmap.
+ *
+ * @field name Name of the characteristic.
+ * @field label Label of the characteristic.
+ */
+message Characteristic {
+    string name = 1;
+    string label = 2;
+}
+
+/** Difficulty represents the difficulty level of the beatmap.
+ *
+ * @field rank Rank of the difficulty.
+ * @field name Name of the difficulty.
+ * @field custom_label Custom label of the difficulty.
+ */
+message Difficulty {
+    int32 rank = 1;
+    string name = 2;
+    string custom_label = 3;
+}
+
+/** BeatmapLevelStatistics represents statistics of the beatmap level.
+ *
+ * @field notes_count Number of notes in the beatmap level.
+ * @field bombs_count Number of bombs in the beatmap level.
+ * @field obstacles_count Number of obstacles in the beatmap level.
+ * @field max_combo Maximum combo achievable in the beatmap level.
+ * @field note_jump_movement_speed Speed of note jump movement.
+ * @field note_jump_start_beat_offset Offset of the note jump start beat.
+ * @field note_lines Number of note lines in the beatmap level.
+ * @field difficulty_rank Rank of the difficulty in the beatmap level.
+ */
+message BeatmapLevelStatistics {
+    int32 notes_count = 1;
+    int32 bombs_count = 2;
+    int32 obstacles_count = 3;
+    int32 max_combo = 4;
+    int32 note_jump_movement_speed = 5;
+    int32 note_jump_start_beat_offset = 6;
+    int32 note_lines = 7;
+    int32 difficulty_rank = 8;
+}
+

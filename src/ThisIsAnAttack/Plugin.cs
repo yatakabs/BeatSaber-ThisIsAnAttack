@@ -1,86 +1,125 @@
 using IPA;
+using IPA.Config;
+using IPA.Config.Stores;
+using IPA.Loader;
+using SiraUtil.Zenject;
+using ThisIsAnAttack.Configuration;
+using ThisIsAnAttack.Installers;
+using ThisIsAnAttack.Logging;
 using UnityEngine;
 using IPALogger = IPA.Logging.Logger;
 
 namespace ThisIsAnAttack;
 
-[Plugin(RuntimeOptions.DynamicInit)]
-public class Plugin
+[Plugin(RuntimeOptions.SingleStartInit)]
+public partial class Plugin
 {
-    // TODO: If using Harmony, uncomment and change YourGitHub to the name of your GitHub account, or use the form "com.company.project.product"
-    //       You must also add a reference to the Harmony assembly in the Libs folder.
-    // public const string HarmonyId = "com.github.YourGitHub.ThisIsAnAttack";
-    // internal static readonly HarmonyLib.Harmony harmony = new HarmonyLib.Harmony(HarmonyId);
+    private IPluginLogger Logger { get; set; } = new DummyPluginLogger();
+    //private Config IpaConfig { get; }
+    //private PluginConfig Config { get; }
 
-    internal static Plugin? Instance { get; private set; }
-    internal static IPALogger? Log { get; private set; }
-    internal static ThisIsAnAttackController PluginController { get { return ThisIsAnAttackController.Instance; } }
+    public const string HarmonyId = "com.github.yatakabs.ThisIsAnAttack";
+    internal static readonly HarmonyLib.Harmony harmony = new(HarmonyId);
 
-    [Init]
     /// <summary>
     /// Called when the plugin is first loaded by IPA (either when the game starts or when the plugin is enabled if it starts disabled).
     /// [Init] methods that use a Constructor or called before regular methods like InitWithConfig.
     /// Only use [Init] with one Constructor.
     /// </summary>
-    public Plugin(IPALogger logger)
-    {
-        Instance = this;
-        Plugin.Log = logger;
-        Plugin.Log?.Debug("Logger initialized.");
-    }
-
-    #region BSIPA Config
-    //Uncomment to use BSIPA's config
-    /*
     [Init]
-    public void InitWithConfig(Config conf)
+    public Plugin(
+        Zenjector zenjector,
+        PluginMetadata metadata,
+        Config ipaConfig,
+        IPALogger ipaLogger)
     {
-        Configuration.PluginConfig.Instance = conf.Generated<Configuration.PluginConfig>();
-        Plugin.Log?.Debug("Config loaded");
+        this.Logger = new IpaPluginLogger(ipaLogger);
+        this.Logger.Debug("Plugin ctor called.");
+
+        var config = this.InitializePluginConfig(ipaConfig);
+
+        zenjector.Install(
+            Location.App,
+            container =>
+            {
+                // Plugin logger
+                container
+                    .BindInstance<IPluginLogger>(this.Logger)
+                    .AsSingle()
+                    .NonLazy();
+
+                // Plugin config
+                container
+                    .BindInstance(config)
+                    .AsSingle()
+                    .NonLazy();
+
+                // Plugin metadata
+                container
+                    .BindInstance(metadata)
+                    .AsSingle()
+                    .NonLazy();
+
+                // Plugin instance (just for reference)
+                container
+                    .BindInterfacesAndSelfTo<Plugin>()
+                    .FromInstance(this)
+                    .AsSingle()
+                    .NonLazy();
+            });
+
+        zenjector.Install<MainInstaller>(Location.App);
+        zenjector.Install<GrpcInstaller>(Location.App);
+        zenjector.Install<ScoringPlayerInstaller>(Location.Player);
     }
-    */
-    #endregion
 
-    #region Disableable
-
-    /// <summary>
-    /// Called when the plugin is enabled (including when the game starts if the plugin is enabled).
-    /// </summary>
-    [OnEnable]
-    public void OnEnable()
+    private PluginConfig InitializePluginConfig(Config ipaConfig)
     {
-        new GameObject("ThisIsAnAttackController").AddComponent<ThisIsAnAttackController>();
-        //ApplyHarmonyPatches();
-    }
-
-    /// <summary>
-    /// Called when the plugin is disabled and on Beat Saber quit. It is important to clean up any Harmony patches, GameObjects, and Monobehaviours here.
-    /// The game should be left in a state as if the plugin was never started.
-    /// Methods marked [OnDisable] must return void or Task.
-    /// </summary>
-    [OnDisable]
-    public void OnDisable()
-    {
-        if (PluginController != null)
+        try
         {
-            GameObject.Destroy(PluginController);
+            this.Logger.Debug("Loading config...");
+            var config = ipaConfig.Generated<PluginConfig>();
+            this.Logger.Info("Config loaded.");
+            return config;
         }
-        //RemoveHarmonyPatches();
+        catch (Exception ex)
+        {
+            this.Logger.Warn(ex, "Failed to read config. Using default config");
+            return ipaConfig.Generated<PluginConfig>();
+        }
     }
 
-    /*
+    #region BSIPA Start/Stop
+
     /// <summary>
-    /// Called when the plugin is disabled and on Beat Saber quit.
-    /// Return Task for when the plugin needs to do some long-running, asynchronous work to disable.
-    /// [OnDisable] methods that return Task are called after all [OnDisable] methods that return void.
+    /// Called when the game is started.
+    /// This is where the plugin should do all of its initialization (e.g. patching, creating GameObjects, etc.).
     /// </summary>
-    [OnDisable]
-    public async Task OnDisableAsync()
+    [OnStart]
+    public void OnApplicationStart()
     {
-        await LongRunningUnloadTask().ConfigureAwait(false);
+        this.Logger.InfoFormat(
+            "OnApplicationStart() called. GameVersion: {0}, UnityVersion: {1}, PluginVersion: {2}",
+            Application.version,
+            Application.unityVersion,
+            "N/A");
     }
-    */
-    #endregion
+
+    /// <summary>
+    /// Called when the game is quitting.
+    /// This is where the plugin should clean up any resources.
+    /// </summary>
+    [OnExit]
+    public void OnApplicationQuit()
+    {
+        this.Logger.InfoFormat(
+            "OnApplicationQuit() called. GameVersion: {0}, UnityVersion: {1}, PluginVersion: {2}",
+            Application.version,
+            Application.unityVersion,
+            "N/A");
+    }
+
+    #endregion BSIPA Start/Stop
 
     // Uncomment the methods in this section if using Harmony
     #region Harmony

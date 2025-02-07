@@ -1,0 +1,10 @@
+{
+  "solution": {
+    "path": "ThisIsAnAttack.sln",
+    "projects": [
+      "src\\MockGrpcService\\MockGrpcService.csproj",
+      "src\\TestClient\\TestClient.csproj",
+      "src\\ThisIsAnAttack.Remoting.Grpc\\ThisIsAnAttack.Remoting.Grpc.csproj"
+    ]
+  }
+}

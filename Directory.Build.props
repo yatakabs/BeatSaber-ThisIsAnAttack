@@ -1,0 +1,124 @@
+<Project>
+  <!--Git Repository Root-->
+  <PropertyGroup>
+    <RepoRoot Condition=" '$(RepoRoot)' == '' OR !HasTrailingSlash('$(RepoRoot)') ">$(MSBuildThisFileDirectory)</RepoRoot>
+    <RepositoryUrl>https://github.com/yatakabs/BeatSaber-ThisIsAnAttack</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+
+  <!--WellKnownDirectories-->
+  <PropertyGroup>
+    <SourceRoot>$(MSBuildThisFileDirectory)src</SourceRoot>
+  </PropertyGroup>
+
+  <!--Project Directories-->
+  <PropertyGroup>
+    <RepoRelativeProjectDir>$([MSBuild]::MakeRelative($(RepoRoot), $(MSBuildProjectDirectory)))</RepoRelativeProjectDir>
+  </PropertyGroup>
+
+
+  <!--Common Build Options-->
+  <PropertyGroup>
+    <Deterministic>true</Deterministic>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <!--<AppOutputBase>$(MSBuildProjectDirectory)\</AppOutputBase>-->
+
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+  </PropertyGroup>
+
+  <!--Settings to accelerate any performances in Visual Studio.-->
+  <PropertyGroup>
+    <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
+
+    <!--<DisableFastUpToDateCheck>true</DisableFastUpToDateCheck>-->
+    <DisableInProcNode>true</DisableInProcNode>
+
+    <DisableImplicitFrameworkReferences>false</DisableImplicitFrameworkReferences>
+    <DisableImplicitDotNetFrameworkPackageVersions>false</DisableImplicitDotNetFrameworkPackageVersions>
+    <DisableImplicitDotNetPlatformPackageVersions>false</DisableImplicitDotNetPlatformPackageVersions>
+
+
+    <!-- For runtime-->
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'!='Release'">
+    <PredefinedCulturesOnly>true</PredefinedCulturesOnly>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <PredefinedCulturesOnly>false</PredefinedCulturesOnly>
+  </PropertyGroup>
+
+  <!--Assembly Information-->
+
+
+  <!-- Credit -->
+  <PropertyGroup>
+    <Title>$(AssemblyName)</Title>
+    <Authors>yas</Authors>
+    <Copyright>Copyright (c) 2025 yas</Copyright>
+    <Description>$(Title)</Description>
+  </PropertyGroup>
+
+  
+  <PropertyGroup>
+    <IncludeSymbols>true</IncludeSymbols>
+  </PropertyGroup>
+
+  <!--ASP.NET Core Common configuration-->
+  <PropertyGroup Condition="'$(UsingMicrosoftNETSdkWeb)' == 'True'">
+    <UserSecretsId>beatsaber-thisisanattack-$(MSBuildProjectName)</UserSecretsId>
+    <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
+
+    <!--For Open API Specification (Swagger)-->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+  </PropertyGroup>
+
+
+  <!--Test Projects-->
+  <PropertyGroup>
+    <IsTestProject>$(MSBuildProjectName.Contains('.Tests'))</IsTestProject>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(IsTestProject)' == 'true'">
+    <ImplicitUsings>false</ImplicitUsings>
+    <UseSourceLink>true</UseSourceLink>
+    <NoWarn>$(NoWarn);NU1603</NoWarn>
+    <CoverletOutputFormat>cobertura</CoverletOutputFormat>
+    <Exclude>[xunit.*]*</Exclude>
+    <CoverletOutput>$(MSBuildThisFileDirectory)coverlet/$(AssemblyName)/$(TargetFramework)/</CoverletOutput>
+  </PropertyGroup>
+
+  <!--Add package references for the unit test projects. -->
+  <ItemGroup Condition="'$(IsTestProject)' == 'true'">
+  </ItemGroup>
+
+  <!--Code Formatting-->
+  <PropertyGroup>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+  </PropertyGroup>
+
+  <!--Docker-->
+  <PropertyGroup>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerfileContext>$(RepoRoot).</DockerfileContext>
+    <DockerfileFile>$(MSBuildProjectDirectory)\Dockerfile</DockerfileFile>
+
+    <!-- Docker Image Path-->
+    <DockerfileTagBase>aituber/platform/api</DockerfileTagBase>
+  </PropertyGroup>
+
+  <!-- Debugging Configuration -->
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+
+</Project>

@@ -1,9 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+
 <!-- This file contains project properties used by the build. -->
 <Project>
+  
+<!--Also import upper level Directory.Build.props-->
+<Import Project="..\..\Directory.Build.props" />
+  
   <PropertyGroup>
     <ImportBSMTTargets>True</ImportBSMTTargets>
     <BSMTProjectType>BSIPA</BSMTProjectType>
+
+    <BaseManifestPath>manifest.json</BaseManifestPath>
+    <GenerateManifest>true</GenerateManifest>
+
+    <LocalRefsDir>$(GameDirectory)</LocalRefsDir>
   </PropertyGroup>
 
   <PropertyGroup>

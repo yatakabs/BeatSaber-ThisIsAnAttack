@@ -70,7 +70,8 @@ public class GrpcRealtimeScoreSubmitter : IRealtimeScoreSubmitter, IDisposable
     {
         this.ThrowIfDisposed();
 
-        await this.SubmitScoreAsync(progress)
+        await this
+            .SubmitScoreAsync(progress)
             .ConfigureAwait(false);
 
         this.Logger.Debug("Finish score submitted.");
@@ -111,7 +112,18 @@ public class GrpcRealtimeScoreSubmitter : IRealtimeScoreSubmitter, IDisposable
         {
             if (disposing)
             {
-                this.RealtimeScoreStream.Dispose();
+                this.RealtimeScoreStream
+                    .RequestStream
+                    .CompleteAsync()
+                    .ContinueWith(t =>
+                    {
+                        if (t.IsFaulted)
+                        {
+                            this.Logger.Error(t.Exception, "Failed to complete the realtime score submitter.");
+                        }
+
+                        this.RealtimeScoreStream.Dispose();
+                    });
             }
 
             // TODO: free unmanaged resources (unmanaged objects) and override finalizer

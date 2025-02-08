@@ -22,34 +22,45 @@ public class MainService : SingleRunningServiceBaseWithLogging
         this.Logger = logger;
     }
 
-    protected override Task RunAsyncCore(
+    protected override async Task RunAsyncCore(
         CompositeDisposable disposables,
         CancellationToken stoppingToken)
     {
         this.Logger.Info($"{nameof(MainService)} started. Stopping token: {stoppingToken.GetHashCode()}");
 
         this.Logger.Info("Registering scene bound actions for the MenuCore scene.");
-        this.SceneChangeMonitor
-            .RegisterSceneBoundActions(
-                scenePredicate: scene =>
-                {
-                    var isMenuCore = scene.name == "MenuCore";
-                    this.Logger.Debug($"Scene predicate: {scene.name} -> {isMenuCore}");
-                    return isMenuCore;
-                },
-                onStart: scene =>
-                {
-                    this.Logger.Info("Menu scene loaded.");
-                },
-                onComplete: scene =>
-                {
-                    this.Logger.Info("Menu scene unloaded.");
-                })
-            .AddTo(disposables);
+        try
+        {
+            this.SceneChangeMonitor
+                .RegisterSceneBoundActions(
+                    scenePredicate: scene =>
+                    {
+                        var isMenuCore = scene.name == "MenuCore";
+                        this.Logger.Debug($"Scene predicate: {scene.name} -> {isMenuCore}");
+                        return isMenuCore;
+                    },
+                    onStart: scene =>
+                    {
+                        this.Logger.Info("Menu scene loaded.");
+                    },
+                    onComplete: scene =>
+                    {
+                        this.Logger.Info("Menu scene unloaded.");
+                    })
+                .AddTo(disposables);
 
-        // Wait for the stopping token to be triggered.
-        this.Logger.Info("Waiting for the stopping token to be triggered.");
-        return Task.Delay(Timeout.Infinite, stoppingToken);
+            // Wait for the stopping token to be triggered.
+            this.Logger.Info("Waiting for the stopping token to be triggered.");
+            await Task.Delay(Timeout.Infinite, stoppingToken).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException ex) when (ex.CancellationToken == stoppingToken)
+        {
+            // Properly handled cancellation. No need to log.
+        }
+        catch (Exception ex)
+        {
+            this.Logger.Error(ex, "An error occurred while running the service.");
+        }
     }
 }
 

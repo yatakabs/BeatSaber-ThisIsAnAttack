@@ -53,7 +53,6 @@ public class GameScoreStreamingService : SingleRunningServiceBaseWithLogging
         this.GameplayModifiers = gameplayModifiers;
         this.BeatmapData = beatmapData;
 
-
         var scoreSaberId = this.PluginConfig.Player?.ScoreSaberId ?? string.Empty;
         this.PlayerId = string.IsNullOrWhiteSpace(scoreSaberId)
             ? this.GameSessionId.ToString()

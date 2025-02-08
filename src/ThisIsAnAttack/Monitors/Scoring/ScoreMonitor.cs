@@ -73,11 +73,11 @@ public class ScoreMonitor : MonitorBase
         this.UpdateSnapshot(newSnapshot);
     }
 
-    private void ScoreController_scoreDidChangeEvent(int score, int maxScore)
+    private void ScoreController_scoreDidChangeEvent(int score, int modifiedScore)
     {
-        this.Logger.Debug($"Score Changed. Score: {score}, MaxScore: {maxScore}");
+        this.Logger.Debug($"Score Changed. Score: {score}, Modified: {modifiedScore}");
 
-        var controllerValues = new ScoreSnapshot
+        var newSnapshot = new ScoreSnapshot
         {
             Score = this.ScoreController.multipliedScore,
             MaxScore = this.ScoreController.immediateMaxPossibleMultipliedScore,
@@ -87,16 +87,8 @@ public class ScoreMonitor : MonitorBase
             Multiplier = this.LatestSnapshot.Scores.Multiplier,
         };
 
-        this.Logger.Debug($"Controller values: {controllerValues}");
-
-        var newSnapshot = this.LatestSnapshot.Scores with
-        {
-            Score = score,
-            MaxScore = maxScore,
-        };
-
+        this.Logger.Debug($"New snapshot: {newSnapshot}");
         this.UpdateSnapshot(newSnapshot);
-
     }
 
     private void UpdateSnapshot(ScoreSnapshot newSnapshot)

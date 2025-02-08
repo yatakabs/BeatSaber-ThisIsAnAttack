@@ -24,7 +24,6 @@ public class GameScoreStreamingService : SingleRunningServiceBaseWithLogging
     public IAudioTimeSource AudioTimeSource { get; }
     public GameplayCoreSceneSetupData GameplayCoreSceneSetupData { get; }
     public GameplayModifiers GameplayModifiers { get; }
-    public IReadonlyBeatmapData BeatmapData { get; }
 
     private string PlayerId { get; }
 
@@ -38,8 +37,7 @@ public class GameScoreStreamingService : SingleRunningServiceBaseWithLogging
         PluginConfig pluginConfig,
         IAudioTimeSource audioTimeSource,
         GameplayCoreSceneSetupData gameplayCoreSceneSetupData,
-        GameplayModifiers gameplayModifiers,
-        IReadonlyBeatmapData beatmapData)
+        GameplayModifiers gameplayModifiers)
         : base(logger)
     {
         this.RealtimeScoreSubmitter = realtimeScoreSubmitter;
@@ -51,8 +49,6 @@ public class GameScoreStreamingService : SingleRunningServiceBaseWithLogging
         this.AudioTimeSource = audioTimeSource;
         this.GameplayCoreSceneSetupData = gameplayCoreSceneSetupData;
         this.GameplayModifiers = gameplayModifiers;
-        this.BeatmapData = beatmapData;
-
 
         var scoreSaberId = this.PluginConfig.Player?.ScoreSaberId ?? string.Empty;
         this.PlayerId = string.IsNullOrWhiteSpace(scoreSaberId)
@@ -75,9 +71,7 @@ public class GameScoreStreamingService : SingleRunningServiceBaseWithLogging
         var songTime = TimeSpan.FromSeconds(this.AudioTimeSource.songTime);
         var songLength = TimeSpan.FromSeconds(this.AudioTimeSource.songLength);
 
-        var level = this.GameplayCoreSceneSetupData.difficultyBeatmap.level;
-        var characteristic = this.GameplayCoreSceneSetupData.difficultyBeatmap.parentDifficultyBeatmapSet.beatmapCharacteristic;
-        var difficultyBeatmap = this.GameplayCoreSceneSetupData.difficultyBeatmap;
+        var beatMap = this.GameplayCoreSceneSetupData.transformedBeatmapData;
 
         static string? parseSongHashFromLevelId(string levelId)
         {
@@ -93,6 +87,8 @@ public class GameScoreStreamingService : SingleRunningServiceBaseWithLogging
             return null;
         }
 
+        var level = this.GameplayCoreSceneSetupData.beatmapLevel;
+
         var songHash = parseSongHashFromLevelId(level.levelID) ?? string.Empty;
 
         var songMetadata = new SongMetadata
@@ -100,7 +96,7 @@ public class GameScoreStreamingService : SingleRunningServiceBaseWithLogging
             SongName = level.songName,
             SongSubName = level.songSubName,
             SongAuthorName = level.songAuthorName,
-            LevelAuthorName = level.levelAuthorName,
+            LevelAuthorName = "N/A",
             SongHash = level.levelID,
             BeatsPerMinute = level.beatsPerMinute,
             PreviewDuration = TimeSpan.FromSeconds(level.previewDuration),
@@ -124,15 +120,11 @@ public class GameScoreStreamingService : SingleRunningServiceBaseWithLogging
             this.GameplayModifiers.songSpeed == GameplayModifiers.SongSpeed.Slower ? GamePlayModifier.SlowerSong : GamePlayModifier.None,
             this.GameplayModifiers.songSpeed == GameplayModifiers.SongSpeed.Faster ? GamePlayModifier.FasterSong : GamePlayModifier.None,
             this.GameplayModifiers.songSpeed == GameplayModifiers.SongSpeed.SuperFast ? GamePlayModifier.SuperFastSong : GamePlayModifier.None,
-        }
-        .Aggregate(GamePlayModifier.None, (acc, x) => acc | x);
-
-        //this.BeatmapData.
+        }.Aggregate(GamePlayModifier.None, (acc, x) => acc | x);
 
         var isPractice = this.GameplayCoreSceneSetupData.practiceSettings != null;
 
         var gameMode = isPractice ? GameMode.Practice : GameMode.Solo;
-        var beatMap = this.BeatmapData;
 
         var isSongTimeOver = songTime >= songLength;
         var isSoftFailed = energy.Energy <= 0 && modifiers.HasFlag(GamePlayModifier.NoFail);
@@ -236,13 +228,13 @@ public class GameScoreStreamingService : SingleRunningServiceBaseWithLogging
                 BeatmapLevelId = level.levelID,
                 Characteristic = new Characteristic
                 {
-                    Name = characteristic.serializedName,
-                    Label = characteristic.name,
+                    Name = "N/A",
+                    Label = "N/A",
                 },
                 Difficulty = new Difficulty
                 {
-                    Name = difficultyBeatmap.difficulty.ToString(),
-                    Rank = difficultyBeatmap.difficultyRank,
+                    Name = "N/A",
+                    Rank = 1,
                 },
                 SongHash = songHash,
                 StartedAt = startedAt,

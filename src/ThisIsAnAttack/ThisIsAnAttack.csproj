@@ -96,6 +96,14 @@
       <HintPath>$(GameDirectory)\Beat Saber_Data\Managed\Main.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="DataModels" Publicize="true">
+      <HintPath>$(GameDirectory)\Beat Saber_Data\Managed\DataModels.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="BGLib.AppFlow" Publicize="true">
+      <HintPath>$(GameDirectory)\Beat Saber_Data\Managed\BGLib.AppFlow.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="HMLib" Publicize="true">
       <HintPath>$(GameDirectory)\Beat Saber_Data\Managed\HMLib.dll</HintPath>
       <Private>False</Private>

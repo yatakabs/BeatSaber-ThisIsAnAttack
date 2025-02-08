@@ -15,8 +15,6 @@ namespace ThisIsAnAttack;
 public partial class Plugin
 {
     private IPluginLogger Logger { get; set; } = new DummyPluginLogger();
-    //private Config IpaConfig { get; }
-    //private PluginConfig Config { get; }
 
     public const string HarmonyId = "com.github.yatakabs.ThisIsAnAttack";
     internal static readonly HarmonyLib.Harmony harmony = new(HarmonyId);

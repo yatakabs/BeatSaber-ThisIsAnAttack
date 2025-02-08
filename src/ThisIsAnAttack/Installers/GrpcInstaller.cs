@@ -55,7 +55,6 @@ public class GrpcInstaller : Installer<GrpcInstaller>
 
                 this.Logger.Info($"Connecting to gRPC server at: {grpcServerAddress}");
 
-
                 var uriBuilder = new UriBuilder(grpcServerAddress);
                 var (host, port, isSecure) = (uriBuilder.Host, uriBuilder.Port, uriBuilder.Scheme == "https");
 

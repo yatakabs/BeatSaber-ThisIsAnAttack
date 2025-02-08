@@ -3,7 +3,7 @@
   "id": "ThisIsAnAttack",
   "name": "ThisIsAnAttack",
   "author": "yas",
-  "version": "0.0.1",
+  "version": "0.0.1-29",
   "description": "",
   "gameVersion": "1.29.1",
   "dependsOn": {

@@ -1,4 +1,4 @@
-﻿using System.Runtime.CompilerServices;
+using System.Runtime.CompilerServices;
 using ThisIsAnAttack.Logging;
 using ThisIsAnAttack.Monitors.Scoring.Entities;
 using Zenject;
